@@ -55,24 +55,32 @@ impl<'source> FromPyObject<'source> for PySystem {
     }
 }
 
-/*
 #[pymethods]
 impl PySystem {
     #[new]
     fn new_py(
         mass: f32,
         position_py: Vec<f32>,
-        moment_of_inertia_py: Vec<Vec<f32>>,
-        subsystems: Vec<PySystem>,
+        mut moment_of_inertia_py: Vec<Vec<f32>>,
+        subsystems_py: Vec<PySystem>,
         description: String,
     ) -> PySystem {
         let position = Vector3::from_vec(position_py);
         
+        let moment_of_inertia = Matrix3::from_rows(&[
+                RowVector3::from_vec(moment_of_inertia_py.remove(0)),
+                RowVector3::from_vec(moment_of_inertia_py.remove(0)),
+                RowVector3::from_vec(moment_of_inertia_py.remove(0)),
+                ]);
+        
+        let mut subsystems: Vec<Box<dyn Inertia>> = Vec::new();
+        for subs in subsystems_py.into_iter() {
+            subsystems.push(Box::new(subs));
+        }
 
         PySystem(System::new(mass, position, moment_of_inertia, subsystems, description))
     }
 }
-*/
 
 /// Formats the sum of two numbers as string.
 #[pyfunction]
